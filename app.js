@@ -1,25 +1,57 @@
 (function () {
 'use strict';
 
-angular.module('nameCalculator', [])
+angular.module('ShoppingListApp', [])
+.controller('ShoppingListAddController', ShoppingListAddController)
+.controller('ShoppingListShowController', ShoppingListShowController)
+.service('ShoppingListService', ShoppingListService);
 
-.controller('nameCalculatorController', function ($scope) {
- $scope.name  = "";
- $scope.totalValue = 0;
+ShoppingListAddController.$inject = ['ShoppingListService'];
+function ShoppingListAddController(ShoppingListService) {
+  var itemAdder = this;
 
- $scope.displayNumeric = function () {
-   var totalNameValue = calculateNumericForString($scope.name);
-   $scope.totalValue = totalNameValue;
- };
+  itemAdder.itemName = "";
+  itemAdder.itemQuantity = "";
 
- function calculateNumericForString(string) {
-   var totalStringValue = 0;
-   for (var i = 0; i < string.length; i++){
-     totalStringValue += string.charCodeAt(i);
-   }
-   return totalStringValue;
- }
+  itemAdder.addItem = function () {
+    ShoppingListService.addItem(itemAdder.itemName, itemAdder.itemQuantity);
+  }
+}
 
-});
+
+ShoppingListShowController.$inject = ['ShoppingListService'];
+function ShoppingListShowController(ShoppingListService) {
+  var showList = this;
+
+  showList.items = ShoppingListService.getItems();
+
+  showList.removeItem = function (itemIndex) {
+    ShoppingListService.removeItem(itemIndex);
+  };
+}
+
+
+function ShoppingListService() {
+  var service = this;
+
+  // List of shopping items
+  var items = [];
+
+  service.addItem = function (itemName, quantity) {
+    var item = {
+      name: itemName,
+      quantity: quantity
+    };
+    items.push(item);
+  };
+
+  service.removeItem = function (itemIdex) {
+    items.splice(itemIdex, 1);
+  };
+
+  service.getItems = function () {
+    return items;
+  };
+}
 
 })();
